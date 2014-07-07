@@ -1429,7 +1429,11 @@ impl<'a> NodeMethods for JSRef<'a, Node> {
     // http://dom.spec.whatwg.org/#dom-node-baseuri
     fn GetBaseURI(&self) -> Option<DOMString> {
         // FIXME (#1824) implement.
-        None
+        // worst case, traverse the tree, find the base element
+        // get location attribute of Window, return that
+        // location is of type Cell<Option<JS<Location>>>
+        let url = window_from_node(self).root().get_url();
+        Some(url.scheme.append(url.host))
     }
 
     // http://dom.spec.whatwg.org/#dom-node-ownerdocument
