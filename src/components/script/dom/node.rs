@@ -1427,6 +1427,7 @@ impl<'a> NodeMethods for JSRef<'a, Node> {
     }
 
     // http://dom.spec.whatwg.org/#dom-node-baseuri
+    // https://www.w3.org/Bugs/Public/show_bug.cgi?id=20976#c6
     fn GetBaseURI(&self) -> Option<DOMString> {
         // FIXME (#1824) implement.
         // worst case, traverse the tree, find the base element
