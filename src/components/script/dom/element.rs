@@ -220,6 +220,7 @@ impl<'a> ElementHelpers for JSRef<'a, Element> {
 
 pub trait AttributeHandlers {
     fn get_attribute(&self, namespace: Namespace, name: &str) -> Option<Temporary<Attr>>;
+    fn get_attribute_ns(&self, namespace: Namespace, name: &str) -> Option<Temporary<Attr>>;
     fn set_attribute_from_parser(&self, local_name: DOMString,
                                  value: DOMString, namespace: Namespace,
                                  prefix: Option<DOMString>);
@@ -256,6 +257,15 @@ impl<'a> AttributeHandlers for JSRef<'a, Element> {
                 name == attr.local_name.as_slice()
             };
 
+            same_name && attr.namespace == namespace
+        }).map(|x| Temporary::from_rooted(&*x))
+    }
+
+    fn get_attribute_ns(&self, namespace: Namespace, name: &str) -> Option<Temporary<Attr>> {
+        let element: &Element = self.deref();
+
+        element.attrs.borrow().iter().map(|attr| attr.root()).find(|attr| {
+            let same_name = name == attr.local_name.as_slice();
             same_name && attr.namespace == namespace
         }).map(|x| Temporary::from_rooted(&*x))
     }
@@ -546,7 +556,7 @@ impl<'a> ElementMethods for JSRef<'a, Element> {
                       namespace: Option<DOMString>,
                       local_name: DOMString) -> Option<DOMString> {
         let namespace = Namespace::from_str(null_str_as_empty_ref(&namespace));
-        self.get_attribute(namespace, local_name.as_slice()).root()
+        self.get_attribute_ns(namespace, local_name.as_slice()).root()
                      .map(|attr| attr.deref().Value())
     }
 
